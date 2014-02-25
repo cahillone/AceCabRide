@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Ace Cab Ride</string>
+    <string name="app_settings">Settings</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_main">Home</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="BAC_button">BAC</string>
+    <string name="taxi_button">TAXI</string>
+    <string name="taxi_phone_number">Taxi Phone Number:</string>
+    <string name="taxi_phone_number_hint">+19168476616</string>
+
+</resources>
