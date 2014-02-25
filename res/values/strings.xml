@@ -8,7 +8,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="BAC_button">BAC</string>
     <string name="taxi_button">TAXI</string>
-    <string name="taxi_phone_number">Taxi Phone Number:</string>
+    <string name="taxi_phone_number">Taxi Phone:</string>
     <string name="taxi_phone_number_hint">+19168476616</string>
+    <string name="taxi_phone_button">Update</string>
 
 </resources>

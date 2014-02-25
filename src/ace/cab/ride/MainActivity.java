@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	
+	private static final String EXTRA_MESSAGE = null;
 	Button requestTaxi;
 
     @Override
@@ -40,11 +41,14 @@ public class MainActivity extends Activity {
 				
 				TextView locationtext = (TextView)findViewById(R.id.location_text);
 				String myString = locationtext.getText().toString();
+				
+				Intent intent = getIntent();
+			    String strTaxiNumber = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 
 				
 				try {
 					SmsManager smsManager = SmsManager.getDefault();
-					smsManager.sendTextMessage("+19168476616", null, myString + "\nfrom my app", null, null);
+					smsManager.sendTextMessage(strTaxiNumber, null, myString + "\nfrom my app", null, null);
 					Toast.makeText(getApplicationContext(), "SMS Sent", Toast.LENGTH_LONG).show();
 				}catch (Exception e) {
 					Toast.makeText(getApplicationContext(), "SMS Failed", Toast.LENGTH_LONG).show();
