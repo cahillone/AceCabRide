@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,15 +23,20 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        try {
 		DeviceLocation deviceLocation = new DeviceLocation(this); 
-        
         Location location = deviceLocation.getLocation();
-        
         String coordinates = deviceLocation.displayLocation(location);
         
         TextView locationText = (TextView)findViewById(R.id.location_text);
         
         locationText.setText(coordinates);
+        
+        } catch (Exception e) {
+        	TextView locationText = (TextView)findViewById(R.id.location_text);
+            
+            locationText.setText("unable to determine device location");
+        }
         
         requestTaxi = (Button)findViewById(R.id.taxi_button);
         requestTaxi.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +65,8 @@ public class MainActivity extends Activity {
         
 		        
     }
+    
+    
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
