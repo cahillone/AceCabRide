@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class SettingsActivity extends Activity {
 	 private static final String EXTRA_MESSAGE = null;
@@ -24,14 +25,7 @@ public class SettingsActivity extends Activity {
 		    String message = editText.getText().toString();
 		    intent.putExtra(EXTRA_MESSAGE, message);
 		    startActivity(intent);
-
-
-		 
-		 /*
-		 EditText editText = (EditText)getText(R.id.taxi_phone_number);
-		 String taxiPhone = editText.toString();
-		 editText.setText(taxiPhone);
-		 */
+		    Toast.makeText(getApplicationContext(), "Taxi number updated", Toast.LENGTH_SHORT).show();
 	 }
 	 
 	 @Override
