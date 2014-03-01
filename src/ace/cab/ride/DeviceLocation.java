@@ -1,6 +1,5 @@
 package ace.cab.ride;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -34,41 +33,42 @@ public class DeviceLocation {
 		return location;
 	}
 	
+	//@input location
+	//@ret String of human readable device location
+	// converts latitude and longitude into a human readable location using the geocode API
 	public String displayLocation(Location location){
-		double latitude;
-		double longitude;
-		String latAndLong;
-		String address;
-		List<Address> addressList = new ArrayList<Address>();
-		
 		if (location != null) {
-			latitude = location.getLatitude();
-			longitude = location.getLongitude();
-		
-			latAndLong = "Latitude: " + latitude + "\nlongitude: " + longitude;
-			
 			Geocoder geocoder = new Geocoder(locationContext);
 			
 			try {
-			
-			addressList = geocoder.getFromLocation(latitude, longitude, 1);
-			
+				List<Address> addressList = geocoder.getFromLocation(
+						location.getLatitude(), 
+						location.getLongitude(), 
+						1);
+				
+				//List<Address> addressList = geocoder.getFromLocation(39.729567, -121.833411, 1);
+				
+				if (addressList != null) {
+					Address address = addressList.get(0);
+					String stringAddress = String.format(
+	                        "%s, %s",
+	                        // If there's a street address, add it
+	                        address.getMaxAddressLineIndex() > 0 ?
+	                                address.getAddressLine(0) : "",
+	                        // Locality is usually a city
+	                        address.getLocality());
+	                // Return the text
+					return stringAddress;
+				}
+				else {
+					return "no address matches found or no backend service available";
+				}			
 			}
 			catch (Exception e) {
-				return "unable to convert lat and long to address";
+				return "unable to convert latitude and longitude to address";
 			}
-			
-			address = addressList.get(0).toString();
-			
-			if (address == null || addressList.get(0) == null) {
-				return "no address matches were found or there is no backend service available";
-			}
-			
-			return address;
 		}else{
 			return "unable to determine location";
 		}
-		
 	}
-
 }
