@@ -25,7 +25,14 @@ public class MainActivity extends Activity {
     
     // called when user presses taxi button
     public void SendTaxiSMS(View view) {
-    	try {
+    	
+    		/*
+    		Intent taxiIntent = new Intent(getApplicationContext(), TaxiActivity.class);
+    		startActivity(taxiIntent);
+    		*/
+    		
+    		
+    		try {
     		DeviceLocation deviceLocation = new DeviceLocation(this); 
     		Location location = deviceLocation.getLocation();
     		String locationString = deviceLocation.displayLocation(location);
@@ -40,6 +47,7 @@ public class MainActivity extends Activity {
             		"yes/no approximate time (minutes)\n"; /* +
             		"example (yes I will be there in 10 minutes)\n" +
             		"y 10"; */
+    		
   	
     		Intent intent = getIntent();
     		String strTaxiNumber = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
@@ -51,6 +59,7 @@ public class MainActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "SMS Failed", Toast.LENGTH_LONG).show();
 			//e.printStackTrace();
 		}
+    	
     };
     
     public void fetchBAC(View view){

@@ -68,7 +68,7 @@ public class DeviceLocation {
 				return "unable to convert latitude and longitude to address";
 			}
 		}else{
-			return "unable to determine location";
+			return "unable to determine location\n no Location";
 		}
 	}
 }

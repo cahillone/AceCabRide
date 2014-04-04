@@ -35,6 +35,10 @@
             android:name="ace.cab.ride.SettingsActivity"
             android:label="@string/app_settings" >    
         </activity>
+        <activity 
+            android:name="ace.cab.ride.TaxiActivity"
+            android:label="@string/app_taxi" >    
+        </activity>
     </application>
 
 </manifest>
