@@ -64,6 +64,11 @@ public class MainActivity extends Activity {
     
     public void fetchBAC(View view){
     	// called when user presses BAC button
+    	
+    	// go to BAC activity
+    	Intent BACIntent = new Intent(getApplicationContext(), BacActivity.class);
+    	startActivity(BACIntent);
+    	
     };
     
     @Override
