@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 
 public class BacActivity extends Activity {
@@ -43,7 +44,16 @@ public class BacActivity extends Activity {
 		    // Loop through paired devices
 		    for (BluetoothDevice device : pairedDevices) {
 		        // Add the name and address to an array adapter to show in a ListView
+		    	mArrayAdapter = new ArrayAdapter<String>(this, R.layout.bt_name_address);
 		        mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+		        
+		        /* not sure here...
+		        ListView pairedDevicesListView = (ListView) findViewById(R.id.tvName);
+		       	
+		        
+		        
+		        pairedDevicesListView.setAdapter(mArrayAdapter);
+		    	*/
 		    }
 		}
 	}
