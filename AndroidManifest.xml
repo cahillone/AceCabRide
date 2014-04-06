@@ -43,6 +43,10 @@
             android:name="ace.cab.ride.BacActivity"
             android:label="@string/app_BAC" >    
         </activity>
+        <activity 
+            android:name="ace.cab.ride.ViewDevicesActivity"
+            android:label="View Devices..." >    
+        </activity>
     </application>
 
 </manifest>
