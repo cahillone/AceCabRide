@@ -52,6 +52,8 @@ public class BacActivity extends Activity {
 	    //btnOff = (Button) findViewById(R.id.btnOff);                // button LED OFF
 	    // txtArduino = (TextView) findViewById(R.id.txtArduino);      // for display the received data from the Arduino
 	     
+	    // new comment
+	    
 	    h = new Handler() {
 	        public void handleMessage(android.os.Message msg) {
 	            switch (msg.what) {
