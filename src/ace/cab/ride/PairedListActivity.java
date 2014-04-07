@@ -1,7 +1,5 @@
 package ace.cab.ride;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import android.app.Activity;
@@ -14,14 +12,36 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-
-public class BacActivity extends Activity {
-	
+public class PairedListActivity extends Activity {
+	private int REQUEST_ENABLE_BT = 1;
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bac);   
-    }
+        setContentView(R.layout.bt_name_address);
+        
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		if (mBluetoothAdapter == null) {
+		    // Device does not support Bluetooth
+		}
+		
+		if (!mBluetoothAdapter.isEnabled()) {
+		    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+		}
+        
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();		
+		// If there are paired devices
+		if (pairedDevices.size() > 0) {
+			ArrayAdapter <String> mArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+		    // Loop through paired devices
+		    for (BluetoothDevice device : pairedDevices) {
+		        // Add the name and address to an array adapter to show in a ListView		        
+		    	mArrayAdapter.add(device.getName() + "\n" + device.getAddress());		        
+		    }
+	        ListView pairedDevicesListView = (ListView) findViewById(R.id.btName);
+	        pairedDevicesListView.setAdapter(mArrayAdapter);
+		}
+	}
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -51,5 +71,5 @@ public class BacActivity extends Activity {
     	default:
     		return super.onOptionsItemSelected(item);
     	}
-    }
+	}
 }

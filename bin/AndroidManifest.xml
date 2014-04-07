@@ -44,8 +44,8 @@
             android:label="@string/app_BAC" >    
         </activity>
         <activity 
-            android:name="ace.cab.ride.ViewDevicesActivity"
-            android:label="View Devices..." >    
+            android:name="ace.cab.ride.PairedListActivity"
+            android:label="View Paired Devices" >    
         </activity>
     </application>
 
