@@ -26,7 +26,7 @@ public class DeviceLocation {
 		
 		String provider = LocationManager.NETWORK_PROVIDER;
 		
-		//String provider = LocationManager.GPS_PROVIDER;
+		// String provider = LocationManager.GPS_PROVIDER;
 		
 		Location location = locationManager.getLastKnownLocation(provider);
 		

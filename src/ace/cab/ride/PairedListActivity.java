@@ -1,6 +1,9 @@
 package ace.cab.ride;
 
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,6 +13,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -20,7 +24,10 @@ public class PairedListActivity extends Activity {
 	private static UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 	BluetoothAdapter mBluetoothAdapter;
 	ConnectThread mConnectThread;
+	ConnectedThread mConnectedThread;
+	Handler mHandler;
 	BluetoothDevice mDevice;
+	char MESSAGE_READ;
 	private int REQUEST_ENABLE_BT = 1;
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +59,10 @@ public class PairedListActivity extends Activity {
 		}
 		
 		// Start thread to connect with the given device
+		
+		if (mConnectThread != null) {
+			mConnectThread.cancel();
+		}
 		mConnectThread = new ConnectThread(mDevice);
 		mConnectThread.run();
 		
@@ -97,9 +108,74 @@ public class PairedListActivity extends Activity {
 	 
 	        // Do work to manage the connection (in a separate thread)
 	        // manageConnectedSocket(mmSocket);
+	        
+	        if (mConnectedThread != null) {
+	        	mConnectedThread.cancel();
+	        }
+	        mConnectedThread = new ConnectedThread(mmSocket);
+	        // mConnectedThread.run();
+	        
 	    }
 	 
 	    /** Will cancel an in-progress connection, and close the socket */
+	    public void cancel() {
+	        try {
+	            mmSocket.close();
+	        } catch (IOException e) { }
+	    }
+	}
+	
+	private class ConnectedThread extends Thread {
+	    private final BluetoothSocket mmSocket;
+	    private final InputStream mmInStream;
+	    private final OutputStream mmOutStream;
+	 
+	    public ConnectedThread(BluetoothSocket socket) {
+	        mmSocket = socket;
+	        InputStream tmpIn = null;
+	        OutputStream tmpOut = null;
+	 
+	        // Get the input and output streams, using temp objects because
+	        // member streams are final
+	        try {
+	            tmpIn = socket.getInputStream();
+	            tmpOut = socket.getOutputStream();
+	        } catch (IOException e) { }
+	 
+	        mmInStream = tmpIn;
+	        mmOutStream = tmpOut;
+	    }
+	 
+	    public void run() {
+	        byte[] buffer = new byte[1024];  // buffer store for the stream
+	        int bytes; // bytes returned from read()
+	        
+	        // Toast.makeText(getApplicationContext(), "in connectedThread.run()", Toast.LENGTH_SHORT).show();
+	 
+	        // Keep listening to the InputStream until an exception occurs
+	        while (true) {
+	            try {
+	                // Read from the InputStream
+	                bytes = mmInStream.read(buffer);
+	                
+	                // Send the obtained bytes to the UI activity
+	                // mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+	                // String string = buffer.toString();
+	                // Toast.makeText(getApplicationContext(), fromBT, Toast.LENGTH_SHORT).show();
+	            } catch (IOException e) {
+	                break;
+	            }
+	        }
+	    }
+	 
+	    /* Call this from the main activity to send data to the remote device */
+	    public void write(byte[] bytes) {
+	        try {
+	            mmOutStream.write(bytes);
+	        } catch (IOException e) { }
+	    }
+	 
+	    /* Call this from the main activity to shutdown the connection */
 	    public void cancel() {
 	        try {
 	            mmSocket.close();
