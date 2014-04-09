@@ -35,11 +35,13 @@ public class PairedListActivity extends Activity {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bt_name_address);
+        setContentView(R.layout.activity_bac);
         
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
 		    // Device does not support Bluetooth
+			Toast.makeText(getApplicationContext(), "Device does not support Bluetooth", Toast.LENGTH_LONG).show();
+			return;
 		}
 		
 		if (!mBluetoothAdapter.isEnabled()) {
@@ -47,6 +49,7 @@ public class PairedListActivity extends Activity {
 		    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 		}
         
+		/*
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();		
 		// If there are paired devices
 		if (pairedDevices.size() > 0) {
@@ -55,11 +58,17 @@ public class PairedListActivity extends Activity {
 		    for (BluetoothDevice device : pairedDevices) {
 		        // Add the name and address to an array adapter to show in a ListView		        
 		    	mArrayAdapter.add(device.getName() + "\n" + device.getAddress());	
-		    	mDevice = device;
 		    }
 	        ListView pairedDevicesListView = (ListView) findViewById(R.id.btName);
 	        pairedDevicesListView.setAdapter(mArrayAdapter);
+		} else {
+			// No paired devices
+			Toast.makeText(getApplicationContext(), "No paired BT devices", Toast.LENGTH_SHORT).show();
+			return;
 		}
+		*/
+		
+		mDevice = mBluetoothAdapter.getRemoteDevice("20:13:11:14:01:49");
 		
 		// Start thread to connect with the given device
 		
@@ -108,15 +117,17 @@ public class PairedListActivity extends Activity {
 	            } catch (IOException closeException) { }
 	            return;
 	        }
+	        
+	        Toast.makeText(getApplicationContext(), "connected!", Toast.LENGTH_SHORT).show();
 	 
 	        // Do work to manage the connection (in a separate thread)
 	        // manageConnectedSocket(mmSocket);
 	        
-	        if (mConnectedThread != null) {
+	        /* if (mConnectedThread != null) {
 	        	mConnectedThread.cancel();
-	        }
+	        } */ 
 	        mConnectedThread = new ConnectedThread(mmSocket);
-	        // mConnectedThread.run();
+	        mConnectedThread.run();
 	        
 	    }
 	 
@@ -124,6 +135,7 @@ public class PairedListActivity extends Activity {
 	    public void cancel() {
 	        try {
 	            mmSocket.close();
+	            Toast.makeText(getApplicationContext(), "cancel in-progress connect, close socket", Toast.LENGTH_SHORT).show();
 	        } catch (IOException e) { }
 	    }
 	}
@@ -162,7 +174,7 @@ public class PairedListActivity extends Activity {
 	                bytes = mmInStream.read(buffer);
 	                
 	                // Send the obtained bytes to the UI activity
-	                // mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+	                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget();
 	                // String string = buffer.toString();
 	                // Toast.makeText(getApplicationContext(), fromBT, Toast.LENGTH_SHORT).show();
 	            } catch (IOException e) {
@@ -182,6 +194,7 @@ public class PairedListActivity extends Activity {
 	    public void cancel() {
 	        try {
 	            mmSocket.close();
+	            Toast.makeText(getApplicationContext(), "socket closed from ConnectedThread", Toast.LENGTH_SHORT).show();
 	        } catch (IOException e) { }
 	    }
 	}
