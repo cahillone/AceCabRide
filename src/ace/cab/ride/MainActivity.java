@@ -63,11 +63,11 @@ public class MainActivity extends Activity {
     };
     
     public void fetchBAC(View view){
-    	// called when user presses BAC button
+    	// called when user presses BAC button (Connect to Breathalyzer button)
     	
-    	// go to BAC activity
-    	Intent BACIntent = new Intent(getApplicationContext(), BacActivity.class);
-    	startActivity(BACIntent);
+    	// go to connect BT activity
+    	Intent connectBT = new Intent(getApplicationContext(), PairedListActivity.class);
+    	startActivity(connectBT);
     	
     };
     
