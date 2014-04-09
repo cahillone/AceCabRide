@@ -30,7 +30,7 @@ public class PairedListActivity extends Activity {
 	char MESSAGE_READ;
 	private int REQUEST_ENABLE_BT = 1;
 	
-	// new UI
+	// new UI ...
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
