@@ -29,6 +29,9 @@ public class PairedListActivity extends Activity {
 	BluetoothDevice mDevice;
 	char MESSAGE_READ;
 	private int REQUEST_ENABLE_BT = 1;
+	
+	// new UI
+	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
