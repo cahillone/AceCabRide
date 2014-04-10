@@ -30,12 +30,10 @@ public class PairedListActivity extends Activity {
 	char MESSAGE_READ;
 	private int REQUEST_ENABLE_BT = 1;
 	
-	// new UI ...
-	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bac);
+        setContentView(R.layout.bt_name_address);
         
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
@@ -123,11 +121,14 @@ public class PairedListActivity extends Activity {
 	        // Do work to manage the connection (in a separate thread)
 	        // manageConnectedSocket(mmSocket);
 	        
-	        /* if (mConnectedThread != null) {
+	         if (mConnectedThread != null) {
 	        	mConnectedThread.cancel();
-	        } */ 
+	        }  
 	        mConnectedThread = new ConnectedThread(mmSocket);
 	        mConnectedThread.run();
+	        
+	        Intent main = new Intent(getApplicationContext(), MainActivity.class);
+	    	startActivity(main);
 	        
 	    }
 	 

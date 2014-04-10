@@ -68,7 +68,6 @@ public class MainActivity extends Activity {
     	// go to connect BT activity
     	Intent connectBT = new Intent(getApplicationContext(), PairedListActivity.class);
     	startActivity(connectBT);
-    	
     };
     
     @Override
