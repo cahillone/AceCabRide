@@ -1,6 +1,5 @@
 package ace.cab.ride;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,6 +13,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -47,7 +47,7 @@ public class PairedListActivity extends Activity {
 		    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
 		}
         
-		/*
+		
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();		
 		// If there are paired devices
 		if (pairedDevices.size() > 0) {
@@ -55,7 +55,8 @@ public class PairedListActivity extends Activity {
 		    // Loop through paired devices
 		    for (BluetoothDevice device : pairedDevices) {
 		        // Add the name and address to an array adapter to show in a ListView		        
-		    	mArrayAdapter.add(device.getName() + "\n" + device.getAddress());	
+		    	mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+		    	mDevice = device;	
 		    }
 	        ListView pairedDevicesListView = (ListView) findViewById(R.id.btName);
 	        pairedDevicesListView.setAdapter(mArrayAdapter);
@@ -64,9 +65,9 @@ public class PairedListActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "No paired BT devices", Toast.LENGTH_SHORT).show();
 			return;
 		}
-		*/
 		
-		mDevice = mBluetoothAdapter.getRemoteDevice("20:13:11:14:01:49");
+		
+		// mDevice = mBluetoothAdapter.getRemoteDevice("20:13:11:14:01:49");
 		
 		// Start thread to connect with the given device
 		
@@ -92,7 +93,9 @@ public class PairedListActivity extends Activity {
 	        try {
 	            // MY_UUID is the app's UUID string, also used by the server code
 	            tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-	        } catch (IOException e) { }
+	        } catch (IOException e) { 
+	        	Log.e("TAG1", "FIRST EXCEPTION: " + e);
+	        }
 	        mmSocket = tmp;
 	    }
 	 
@@ -109,12 +112,14 @@ public class PairedListActivity extends Activity {
 	        } catch (IOException connectException) {
 	            // Unable to connect; close the socket and get out
 	        	Toast.makeText(getApplicationContext(), "unable to connect", Toast.LENGTH_SHORT).show();
+	        	Log.e("TAG2", "SECOND EXCEPTION: " + connectException);
 	            try {
 	                mmSocket.close();
 	                Toast.makeText(getApplicationContext(), "socket closed", Toast.LENGTH_SHORT).show();
 	            } catch (IOException closeException) { }
 	            return;
 	        }
+
 	        
 	        Toast.makeText(getApplicationContext(), "connected!", Toast.LENGTH_SHORT).show();
 	 
@@ -127,8 +132,8 @@ public class PairedListActivity extends Activity {
 	        mConnectedThread = new ConnectedThread(mmSocket);
 	        mConnectedThread.run();
 	        
-	        Intent main = new Intent(getApplicationContext(), MainActivity.class);
-	    	startActivity(main);
+	        //Intent main = new Intent(getApplicationContext(), MainActivity.class);
+	    	//startActivity(main);
 	        
 	    }
 	 
@@ -175,9 +180,10 @@ public class PairedListActivity extends Activity {
 	                bytes = mmInStream.read(buffer);
 	                
 	                // Send the obtained bytes to the UI activity
-	                mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget();
-	                // String string = buffer.toString();
-	                // Toast.makeText(getApplicationContext(), fromBT, Toast.LENGTH_SHORT).show();
+	                // mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+	                Log.i("MSGTAG", "buffer: " + buffer);
+	                Log.i("MSGTAG2", "MESSAGE_READ: " + MESSAGE_READ);
+	                Log.i("MSGTAG3", "num of bytes: " + bytes);
 	            } catch (IOException e) {
 	                break;
 	            }
