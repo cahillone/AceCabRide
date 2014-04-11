@@ -1,9 +1,12 @@
 package ace.cab.ride;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,25 +16,50 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+	private BluetoothAdapter mBluetoothAdapter;
+	private BluetoothDevice mDevice;
+	private ConnectThread mConnectThread;
+	private Handler mHandler;
 	
 	private static final String EXTRA_MESSAGE = null;
+	private int REQUEST_ENABLE_BT = 1;
+	final int RECEIVE_MESSAGE = 1;
 	Button requestTaxi;
+	TextView RxBuffer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);        
+        setContentView(R.layout.activity_main);
+        
+        RxBuffer = (TextView) findViewById(R.id.read_value);
+        
+        
+        mHandler = new Handler() {
+        	public void handleMessage(android.os.Message msg) {
+        		switch (msg.what){
+        		case RECEIVE_MESSAGE:
+        			byte[] readBuf = (byte[]) msg.obj;
+        			String strIncom = new String(readBuf, 0, msg.arg1);
+        			RxBuffer.setText("Rx Buffer: " + strIncom);
+        			break;
+        			/*
+        			mStringBuilder.append(strIncom);
+        			int endOfLineIndex = mStringBuilder.indexOf("\r\n");
+        			if (endOfLineIndex > 0) {
+        				String sbprint = mStringBuilder.substring(0, endOfLineIndex);
+        				mStringBuilder.delete(0, sb.length());
+        				RxBuffer.setText("Rx Buffer: " + sbprint);
+        			}
+        			*/
+        		}
+        	}
+        };
     }
     
     // called when user presses taxi button
     public void SendTaxiSMS(View view) {
-    	
-    		/*
-    		Intent taxiIntent = new Intent(getApplicationContext(), TaxiActivity.class);
-    		startActivity(taxiIntent);
-    		*/
-    		
-    		
+  
     		try {
     		DeviceLocation deviceLocation = new DeviceLocation(this); 
     		Location location = deviceLocation.getLocation();
@@ -64,11 +92,37 @@ public class MainActivity extends Activity {
     
     public void fetchBAC(View view){
     	// called when user presses BAC button (Connect to Breathalyzer button)
+    	// ensure device supports Bluetooth
+    	mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    	if (mBluetoothAdapter == null) {
+    	    // Device does not support Bluetooth
+    		return;
+    	}
+    	// ensure Bluetooth is enabled
+    	if (!mBluetoothAdapter.isEnabled()) {
+    	    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+    	    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+    	}
+    	// set device address equal to MAC address of Bluetooth device on Breathalyzer
+    	mDevice = mBluetoothAdapter.getRemoteDevice("20:13:11:14:01:49");
+    	// connect in a separate thread
+    	if (mConnectThread != null) {
+    		mConnectThread.cancel();
+    	}
+    	mConnectThread = new ConnectThread(mDevice);
+    	mConnectThread.run(mBluetoothAdapter);
     	
-    	// go to connect BT activity
-    	Intent connectBT = new Intent(getApplicationContext(), PairedListActivity.class);
-    	startActivity(connectBT);
+    	return; // ????
     };
+    
+    @Override
+    public void onStop() {
+    	super.onStop();
+    	if (mConnectThread != null) {
+    		mConnectThread.cancel();
+    	}
+    }
+    
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
