@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,11 +22,11 @@ public class MainActivity extends Activity {
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothDevice mDevice;
 	private ConnectThread mConnectThread;
-	private Handler mHandler;
+	public Handler mHandler;
 	
 	private static final String EXTRA_MESSAGE = null;
 	private int REQUEST_ENABLE_BT = 1;
-	final int RECEIVE_MESSAGE = 1;
+	public final int RECEIVE_MESSAGE = 1;
 	Button requestTaxi;
 	TextView RxBuffer;
 
@@ -34,27 +37,26 @@ public class MainActivity extends Activity {
         
         RxBuffer = (TextView) findViewById(R.id.read_value);
         
-        
-        mHandler = new Handler() {
-        	public void handleMessage(android.os.Message msg) {
-        		switch (msg.what){
+        mHandler = new Handler(Looper.getMainLooper()) {
+        	@Override
+        	public void handleMessage(Message inputMessage) {
+        		switch(inputMessage.what){
         		case RECEIVE_MESSAGE:
-        			byte[] readBuf = (byte[]) msg.obj;
-        			String strIncom = new String(readBuf, 0, msg.arg1);
-        			RxBuffer.setText("Rx Buffer: " + strIncom);
+        			byte[] readBuf = (byte[]) inputMessage.obj;
+        			Log.i("TAG", "in case RECEIVE_MESSAGE main activity");
+        			Log.i("TAG", "readBuf[0] in Main Activity: " + readBuf[0]);
+        			Log.i("TAG", "readBuf[1] in Main Activity: " + readBuf[1]);
+        			Log.i("TAG", "readBuf[2] in Main Activity: " + readBuf[2]);
+        			Log.i("TAG", "readBuf[3] in Main Activity: " + readBuf[3]);
         			break;
-        			/*
-        			mStringBuilder.append(strIncom);
-        			int endOfLineIndex = mStringBuilder.indexOf("\r\n");
-        			if (endOfLineIndex > 0) {
-        				String sbprint = mStringBuilder.substring(0, endOfLineIndex);
-        				mStringBuilder.delete(0, sb.length());
-        				RxBuffer.setText("Rx Buffer: " + sbprint);
-        			}
-        			*/
+        		default:
+        			super.handleMessage(inputMessage);
         		}
         	}
         };
+        
+        Log.i("TAG", "handler onCreate: " + mHandler);
+        
     }
     
     // called when user presses taxi button
@@ -109,8 +111,10 @@ public class MainActivity extends Activity {
     	if (mConnectThread != null) {
     		mConnectThread.cancel();
     	}
+    	
+    	Log.i("TAG", "handler fetchBAC: " + mHandler);
     	mConnectThread = new ConnectThread(mDevice);
-    	mConnectThread.run(mBluetoothAdapter);
+    	mConnectThread.run(mBluetoothAdapter, mHandler);
     	
     	return; // ????
     };

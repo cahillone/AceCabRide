@@ -14,10 +14,7 @@ public class ConnectedThread extends Thread {
 	private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
-    private int RECEIVE_MESSAGE = 1;
-    private Handler mHandler;
-    public Handler SendToHandler;
-    Message msg;
+    public int RECEIVE_MESSAGE = 1;
     
     public ConnectedThread(BluetoothSocket socket) {
         mmSocket = socket;
@@ -35,17 +32,19 @@ public class ConnectedThread extends Thread {
         mmOutStream = tmpOut;
     }
  
-    public void run() {
+    public void run(Handler mHandler) {
     	Log.i("TAG", "BEGIN mConnectedThread");
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
+        
+        Log.i("TAG", "handler ConnectedThread: " + mHandler);
  
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
-                Log.i("TAG", "Rx buffer: " + buffer.toString());
+                Log.i("TAG", "Rx buffer: " + buffer);
                 Log.i("TAG", "Rx buffer bytes: " + bytes);
                 Log.i("TAG", "Rx buffer0: " + buffer[0]);
                 Log.i("TAG", "Rx buffer1: " + buffer[1]);
@@ -53,9 +52,7 @@ public class ConnectedThread extends Thread {
                 Log.i("TAG", "Rx buffer3: " + buffer[3]);
                 Log.i("TAG", "Rx buffer4: " + buffer[4]);
                 // Send the obtained bytes to the UI activity
-                msg = mHandler.obtainMessage(RECEIVE_MESSAGE, bytes, -1, buffer);
-                SendToHandler = msg.getTarget();
-                msg.sendToTarget();
+                mHandler.obtainMessage(RECEIVE_MESSAGE, bytes, -1, buffer).sendToTarget();
             } catch (Exception e) {
             	Log.e("TAG", "ConnectedThread.run() error: " + e);
                 break;

@@ -6,6 +6,8 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
+import android.util.Log;
 
 public class ConnectThread extends Thread {
 	private final BluetoothSocket mmSocket;
@@ -28,7 +30,7 @@ public class ConnectThread extends Thread {
         mmSocket = tmp;
     }
  
-    public void run(BluetoothAdapter mBluetoothAdapter) {
+    public void run(BluetoothAdapter mBluetoothAdapter, Handler mHandler) {
         // Cancel discovery because it will slow down the connection
         mBluetoothAdapter.cancelDiscovery();
  
@@ -45,7 +47,7 @@ public class ConnectThread extends Thread {
         }
  
         // Do work to manage the connection (in a separate thread)
-        manageConnectedSocket(mmSocket);
+        manageConnectedSocket(mmSocket, mHandler);
     }
  
     /** Will cancel an in-progress connection, and close the socket */
@@ -55,12 +57,13 @@ public class ConnectThread extends Thread {
         } catch (IOException e) { }
     }
     
-    public void manageConnectedSocket(BluetoothSocket mmSocket){
+    public void manageConnectedSocket(BluetoothSocket mmSocket, Handler mHandler){
     	if (mConnectedThread != null) {
     		mConnectedThread.cancel();
     	}
+    	Log.i("TAG", "handler ConnectThread: " + mHandler);
     	mConnectedThread = new ConnectedThread(mmSocket);
-		mConnectedThread.run();
+    	mConnectedThread.run(mHandler);
     }
 
 }
