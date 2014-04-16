@@ -6,17 +6,25 @@ import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 public class ConnectThread extends Thread {
 	private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
     private ConnectedThread mConnectedThread;
+    private BluetoothAdapter mBluetoothAdapter;
+    private Handler mHandler;
+    private BluetoothDevice mDevice;
     
     private static UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
  
-    public ConnectThread(BluetoothDevice device) {
+    public ConnectThread(BluetoothDevice device, BluetoothAdapter btAdapter, Handler btHandler) {
+    	mBluetoothAdapter = btAdapter;
+    	mHandler = btHandler;
+    	mDevice = device;
         // Use a temporary object that is later assigned to mmSocket,
         // because mmSocket is final
         BluetoothSocket tmp = null;
@@ -30,7 +38,7 @@ public class ConnectThread extends Thread {
         mmSocket = tmp;
     }
  
-    public void run(BluetoothAdapter mBluetoothAdapter, Handler mHandler) {
+    public void run() {
         // Cancel discovery because it will slow down the connection
         mBluetoothAdapter.cancelDiscovery();
  
@@ -47,7 +55,7 @@ public class ConnectThread extends Thread {
         }
  
         // Do work to manage the connection (in a separate thread)
-        manageConnectedSocket(mmSocket, mHandler);
+        manageConnectedSocket(mmSocket, mHandler, mDevice);
     }
  
     /** Will cancel an in-progress connection, and close the socket */
@@ -57,13 +65,22 @@ public class ConnectThread extends Thread {
         } catch (IOException e) { }
     }
     
-    public void manageConnectedSocket(BluetoothSocket mmSocket, Handler mHandler){
+    public void manageConnectedSocket(BluetoothSocket mmSocket, Handler mHandler, BluetoothDevice device){
     	if (mConnectedThread != null) {
     		mConnectedThread.cancel();
     	}
+    	
+    	Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_DEVICE_NAME);
+    	Bundle bundle = new Bundle();
+    	bundle.putString(MainActivity.DEVICE_NAME, device.getName());
+    	msg.setData(bundle);
+    	mHandler.sendMessage(msg);
+    	
+    	Log.i("TAG", "manageConnectedSocket() device name: " + device.getName());
+    	
     	Log.i("TAG", "handler ConnectThread: " + mHandler);
-    	mConnectedThread = new ConnectedThread(mmSocket);
-    	mConnectedThread.run(mHandler);
+    	mConnectedThread = new ConnectedThread(mmSocket, mHandler);
+    	mConnectedThread.start();
     }
 
 }

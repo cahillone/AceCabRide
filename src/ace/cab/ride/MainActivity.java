@@ -22,18 +22,27 @@ public class MainActivity extends Activity {
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothDevice mDevice;
 	private ConnectThread mConnectThread;
-	public Handler mHandler;
 	
 	private static final String EXTRA_MESSAGE = null;
 	private int REQUEST_ENABLE_BT = 1;
-	public final int RECEIVE_MESSAGE = 1;
+	public static final int MESSAGE_READ = 2;
+	public static final int MESSAGE_DEVICE_NAME = 1;
+	public static final String DEVICE_NAME = "device_name";
 	Button requestTaxi;
 	TextView RxBuffer;
+	
+	private String mConnectedDeviceName = null;
+	private byte[] mByteArray = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        
+        
+        /*
+        RxBuffer = new TextView();
         
         RxBuffer = (TextView) findViewById(R.id.read_value);
         
@@ -41,9 +50,11 @@ public class MainActivity extends Activity {
         	@Override
         	public void handleMessage(Message inputMessage) {
         		switch(inputMessage.what){
-        		case RECEIVE_MESSAGE:
+        		case MESSAGE_READ:
         			byte[] readBuf = (byte[]) inputMessage.obj;
-        			Log.i("TAG", "in case RECEIVE_MESSAGE main activity");
+        			String str = new String(readBuf, 0, inputMessage.arg1);
+        			Log.i("TAG", "in case MESSAGE_READ main activity");
+        			Log.i("TAG", "string in Main Activity: " + str);
         			Log.i("TAG", "readBuf[0] in Main Activity: " + readBuf[0]);
         			Log.i("TAG", "readBuf[1] in Main Activity: " + readBuf[1]);
         			Log.i("TAG", "readBuf[2] in Main Activity: " + readBuf[2]);
@@ -54,10 +65,33 @@ public class MainActivity extends Activity {
         		}
         	}
         };
-        
+        */
         Log.i("TAG", "handler onCreate: " + mHandler);
         
     }
+    
+    private final Handler mHandler = new Handler() {
+    	@Override
+    	public void handleMessage(Message msg) {
+    		Log.i("TAG", "handler constructor: " + mHandler);
+    		switch (msg.what){
+    		case MESSAGE_DEVICE_NAME:
+    			// save the connected device's name
+    			mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+    			Log.i("TAG", "connected to: " + mConnectedDeviceName);
+    			Toast.makeText(getApplicationContext(), "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+    			break;
+    		case MESSAGE_READ:
+    			mByteArray = (byte[]) msg.obj;
+    			Log.i("TAG", "mByteArray[0] in Main Activity: " + mByteArray[0]);
+    			Log.i("TAG", "mByteArray[1] in Main Activity: " + mByteArray[1]);
+    			Log.i("TAG", "mByteArray[2] in Main Activity: " + mByteArray[2]);
+    			Log.i("TAG", "mByteArray[3] in Main Activity: " + mByteArray[3]);
+    			break;
+    		}
+    	}
+    };
+    
     
     // called when user presses taxi button
     public void SendTaxiSMS(View view) {
@@ -113,10 +147,12 @@ public class MainActivity extends Activity {
     	}
     	
     	Log.i("TAG", "handler fetchBAC: " + mHandler);
-    	mConnectThread = new ConnectThread(mDevice);
-    	mConnectThread.run(mBluetoothAdapter, mHandler);
+    	mConnectThread = new ConnectThread(mDevice, mBluetoothAdapter, mHandler);
+    	mConnectThread.start();
     	
-    	return; // ????
+    	Log.i("TAG", "reached end of fetchBAC()");
+    	
+    	// return; // ????
     };
     
     @Override

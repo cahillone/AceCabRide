@@ -5,18 +5,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.bluetooth.BluetoothSocket;
-import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 public class ConnectedThread extends Thread {
 	private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
-    public int RECEIVE_MESSAGE = 1;
+    private Handler mHandler;
     
-    public ConnectedThread(BluetoothSocket socket) {
+    public ConnectedThread(BluetoothSocket socket, Handler btHandler) {
+    	mHandler = btHandler;
         mmSocket = socket;
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
@@ -32,7 +31,7 @@ public class ConnectedThread extends Thread {
         mmOutStream = tmpOut;
     }
  
-    public void run(Handler mHandler) {
+    public void run() {
     	Log.i("TAG", "BEGIN mConnectedThread");
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
@@ -52,7 +51,7 @@ public class ConnectedThread extends Thread {
                 Log.i("TAG", "Rx buffer3: " + buffer[3]);
                 Log.i("TAG", "Rx buffer4: " + buffer[4]);
                 // Send the obtained bytes to the UI activity
-                mHandler.obtainMessage(RECEIVE_MESSAGE, bytes, -1, buffer).sendToTarget();
+                mHandler.obtainMessage(MainActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
             } catch (Exception e) {
             	Log.e("TAG", "ConnectedThread.run() error: " + e);
                 break;
