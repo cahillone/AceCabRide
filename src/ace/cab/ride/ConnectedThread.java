@@ -35,6 +35,7 @@ public class ConnectedThread extends Thread {
     	Log.i("TAG", "BEGIN mConnectedThread");
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
+        short shortBuffer;
         
         Log.i("TAG", "handler ConnectedThread: " + mHandler);
  
@@ -45,8 +46,9 @@ public class ConnectedThread extends Thread {
                 bytes = mmInStream.read(buffer);
                 Log.i("TAG", "Rx buffer: " + buffer);
                 Log.i("TAG", "Rx buffer bytes: " + bytes);
-                Log.i("TAG", "Rx buffer0: " + buffer[0]);
-                Log.i("TAG", "Rx buffer1: " + buffer[1]);
+                Log.i("TAG1", "Rx buffer0 | 1: " + (buffer[0] | buffer[1]));
+                Log.i("TAG1", "Rx buffer0: " + buffer[0]);
+                Log.i("TAG1", "Rx buffer1: " + buffer[1]);
                 Log.i("TAG", "Rx buffer2: " + buffer[2]);
                 Log.i("TAG", "Rx buffer3: " + buffer[3]);
                 Log.i("TAG", "Rx buffer4: " + buffer[4]);

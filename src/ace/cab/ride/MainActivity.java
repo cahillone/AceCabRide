@@ -7,14 +7,12 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,11 +23,11 @@ public class MainActivity extends Activity {
 	
 	private static final String EXTRA_MESSAGE = null;
 	private int REQUEST_ENABLE_BT = 1;
+	
 	public static final int MESSAGE_READ = 2;
 	public static final int MESSAGE_DEVICE_NAME = 1;
+	
 	public static final String DEVICE_NAME = "device_name";
-	Button requestTaxi;
-	TextView RxBuffer;
 	
 	private String mConnectedDeviceName = null;
 	private byte[] mByteArray = null;
@@ -38,36 +36,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        
-        
-        /*
-        RxBuffer = new TextView();
-        
-        RxBuffer = (TextView) findViewById(R.id.read_value);
-        
-        mHandler = new Handler(Looper.getMainLooper()) {
-        	@Override
-        	public void handleMessage(Message inputMessage) {
-        		switch(inputMessage.what){
-        		case MESSAGE_READ:
-        			byte[] readBuf = (byte[]) inputMessage.obj;
-        			String str = new String(readBuf, 0, inputMessage.arg1);
-        			Log.i("TAG", "in case MESSAGE_READ main activity");
-        			Log.i("TAG", "string in Main Activity: " + str);
-        			Log.i("TAG", "readBuf[0] in Main Activity: " + readBuf[0]);
-        			Log.i("TAG", "readBuf[1] in Main Activity: " + readBuf[1]);
-        			Log.i("TAG", "readBuf[2] in Main Activity: " + readBuf[2]);
-        			Log.i("TAG", "readBuf[3] in Main Activity: " + readBuf[3]);
-        			break;
-        		default:
-        			super.handleMessage(inputMessage);
-        		}
-        	}
-        };
-        */
-        Log.i("TAG", "handler onCreate: " + mHandler);
-        
     }
     
     private final Handler mHandler = new Handler() {
@@ -79,20 +47,33 @@ public class MainActivity extends Activity {
     			// save the connected device's name
     			mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
     			Log.i("TAG", "connected to: " + mConnectedDeviceName);
-    			Toast.makeText(getApplicationContext(), "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+    			
+    			TextView tvConnectionStatus = (TextView)findViewById(R.id.bt_connection_status);
+                tvConnectionStatus.setText("Bluetooth connected: " + mConnectedDeviceName);
+    			
+                Toast.makeText(getApplicationContext(), "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
     			break;
     		case MESSAGE_READ:
     			mByteArray = (byte[]) msg.obj;
+    			try {
+    			String string = new String(mByteArray, 0, 4, "US-ASCII");
+    			Log.i("TAG", "string: " + string);
+    			} catch (Exception e) {
+    				Log.i("TAG", "string decoding exception: " + e);
+    			}
+    			short adc_value = (short) ((mByteArray[0] << 8) | (mByteArray[1]));
+    			Log.i("TAG", "msg.obj: " + msg.obj);
+    			Log.i("TAG2", "adc_value: " + adc_value);
     			Log.i("TAG", "mByteArray[0] in Main Activity: " + mByteArray[0]);
     			Log.i("TAG", "mByteArray[1] in Main Activity: " + mByteArray[1]);
     			Log.i("TAG", "mByteArray[2] in Main Activity: " + mByteArray[2]);
     			Log.i("TAG", "mByteArray[3] in Main Activity: " + mByteArray[3]);
+    			Log.i("TAG", "mByteArray[4] in Main Activity: " + mByteArray[4]);
     			break;
     		}
     	}
     };
-    
-    
+
     // called when user presses taxi button
     public void SendTaxiSMS(View view) {
   
@@ -145,14 +126,8 @@ public class MainActivity extends Activity {
     	if (mConnectThread != null) {
     		mConnectThread.cancel();
     	}
-    	
-    	Log.i("TAG", "handler fetchBAC: " + mHandler);
     	mConnectThread = new ConnectThread(mDevice, mBluetoothAdapter, mHandler);
     	mConnectThread.start();
-    	
-    	Log.i("TAG", "reached end of fetchBAC()");
-    	
-    	// return; // ????
     };
     
     @Override
@@ -162,7 +137,6 @@ public class MainActivity extends Activity {
     		mConnectThread.cancel();
     	}
     }
-    
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
