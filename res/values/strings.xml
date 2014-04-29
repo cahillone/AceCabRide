@@ -9,7 +9,7 @@
     <string name="action_main">Home</string>
     <string name="action_connect">BT Connect</string>
     <string name="hello_world">Hello world!</string>
-    <string name="BAC_button">Connect to Breathalyzer</string>
+    <string name="BAC_button">Test Your BAC</string>
     <string name="taxi_button">Request Taxi</string>
     <string name="taxi_phone_number">Taxi Phone:</string>
     <string name="taxi_phone_number_hint">+15555555555</string>
@@ -19,5 +19,6 @@
     <string name="BT_connection_status">[Not] Connected to HC-06</string>
     <string name="ADC_value">ADC value:</string>
     <string name="BAC_ui">Your BAC:</string>
+    <string name="connect_BAC">Connect to Breathalyzer</string>
 
 </resources>

@@ -11,11 +11,20 @@
   	    android:layout_weight="1">
     
     	<Button 
-        		android:layout_width="match_parent"
+        		android:layout_width="0dp"
+        		android:layout_weight="1"
        			android:layout_height="match_parent"
         		android:text="@string/BAC_button" 
         		android:id="@+id/BAC_button"
         		android:onClick="fetchBAC"/>
+    	
+    	<Button 
+    	    	android:layout_width="0dp"
+    	    	android:layout_weight="1"
+       			android:layout_height="match_parent"
+        		android:text="@string/connect_BAC" 
+        		android:id="@+id/connect_BAC"
+        		android:onClick="connect_BAC"/>
    	</LinearLayout>
    	
     <LinearLayout 

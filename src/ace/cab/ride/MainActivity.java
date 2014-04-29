@@ -107,7 +107,7 @@ public class MainActivity extends Activity {
     	
     };
     
-    public void fetchBAC(View view){
+    public void connect_BAC(View view){
     	// called when user presses BAC button (Connect to Breathalyzer button)
     	// ensure device supports Bluetooth
     	mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -129,6 +129,10 @@ public class MainActivity extends Activity {
     	mConnectThread = new ConnectThread(mDevice, mBluetoothAdapter, mHandler);
     	mConnectThread.start();
     };
+    
+    public void fetchBAC(View view){
+    	// called when user presses test BAC button
+    }
     
     @Override
     public void onStop() {
