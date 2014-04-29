@@ -31,6 +31,10 @@ public class MainActivity extends Activity {
 	
 	private String mConnectedDeviceName = null;
 	private byte[] mByteArray = null;
+	
+	public void SetConnectedThread(){
+		
+	}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +136,13 @@ public class MainActivity extends Activity {
     
     public void fetchBAC(View view){
     	// called when user presses test BAC button
+    	byte[] bytes = "chaddd".getBytes();
+    	
+    	try {
+    		mConnectThread.write(bytes);
+    	} catch(Exception e) {
+    		Log.i("TAG", "in Main Activity mConnectThread.write(): " + e);
+    	}
     }
     
     @Override

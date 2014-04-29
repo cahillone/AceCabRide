@@ -57,6 +57,10 @@ public class ConnectThread extends Thread {
         // Do work to manage the connection (in a separate thread)
         manageConnectedSocket(mmSocket, mHandler, mDevice);
     }
+    
+    public void write(byte[] out) {
+    	mConnectedThread.write(out);
+    }
  
     /** Will cancel an in-progress connection, and close the socket */
     public void cancel() {
@@ -68,7 +72,7 @@ public class ConnectThread extends Thread {
     public void manageConnectedSocket(BluetoothSocket mmSocket, Handler mHandler, BluetoothDevice device){
     	if (mConnectedThread != null) {
     		mConnectedThread.cancel();
-    	}
+    	} 
     	
     	Message msg = mHandler.obtainMessage(MainActivity.MESSAGE_DEVICE_NAME);
     	Bundle bundle = new Bundle();
