@@ -16,7 +16,7 @@
     <string name="taxi_phone_button">Update</string>
     <string name="BAC_activity_title">Blood Alcohol Content</string>
     <string name="location_ui">Your Location -> </string>
-    <string name="BT_connection_status">[Not] Connected to HC-06</string>
+    <string name="BT_connection_status">Connected to Breathalyzer? </string>
     <string name="ADC_value">ADC value:</string>
     <string name="BAC_ui">Your BAC:</string>
     <string name="connect_BAC">Connect to Breathalyzer</string>

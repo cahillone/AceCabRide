@@ -20,6 +20,9 @@ public class MainActivity extends Activity {
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothDevice mDevice;
 	private ConnectThread mConnectThread;
+	private TextView tvConnectionStatus;
+	private TextView tvLocationText;
+	private TextView tvBAC;
 	
 	private static final String EXTRA_MESSAGE = null;
 	private int REQUEST_ENABLE_BT = 1;
@@ -32,6 +35,8 @@ public class MainActivity extends Activity {
 	private String mConnectedDeviceName = null;
 	private byte[] mByteArray = null;
 	
+	private boolean taxi_requested = false; // flag to indicate SMS message has been sent to taxi
+	
 	public void SetConnectedThread(){
 		
 	}
@@ -40,6 +45,15 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        tvConnectionStatus = (TextView)findViewById(R.id.bt_connection_status);
+        tvConnectionStatus.setText("Breathalyzer is disconnected");
+        
+        tvLocationText = (TextView)findViewById(R.id.location_text);
+        tvLocationText.setText("Location: not yet determined");
+        
+        tvBAC = (TextView)findViewById(R.id.BAC);
+        tvBAC.setText("Your BAC: not yet determined");
     }
     
     private final Handler mHandler = new Handler() {
@@ -50,29 +64,20 @@ public class MainActivity extends Activity {
     		case MESSAGE_DEVICE_NAME:
     			// save the connected device's name
     			mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-    			Log.i("TAG", "connected to: " + mConnectedDeviceName);
+    			Log.i("TAG", "connected to: " + mConnectedDeviceName); // for debugging
     			
-    			TextView tvConnectionStatus = (TextView)findViewById(R.id.bt_connection_status);
-                tvConnectionStatus.setText("Bluetooth connected: " + mConnectedDeviceName);
+                tvConnectionStatus.setText("Breathalyzer connected via " + mConnectedDeviceName);
     			
                 Toast.makeText(getApplicationContext(), "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
     			break;
     		case MESSAGE_READ:
     			mByteArray = (byte[]) msg.obj;
-    			try {
-    			String string = new String(mByteArray, 0, 4, "US-ASCII");
-    			Log.i("TAG", "string: " + string);
-    			} catch (Exception e) {
-    				Log.i("TAG", "string decoding exception: " + e);
+    			if (mByteArray[0] < 10) {
+    				tvBAC.setText("Your BAC: 0.0" + mByteArray[0]);
     			}
-    			short adc_value = (short) ((mByteArray[0] << 8) | (mByteArray[1]));
-    			Log.i("TAG", "msg.obj: " + msg.obj);
-    			Log.i("TAG2", "adc_value: " + adc_value);
-    			Log.i("TAG", "mByteArray[0] in Main Activity: " + mByteArray[0]);
-    			Log.i("TAG", "mByteArray[1] in Main Activity: " + mByteArray[1]);
-    			Log.i("TAG", "mByteArray[2] in Main Activity: " + mByteArray[2]);
-    			Log.i("TAG", "mByteArray[3] in Main Activity: " + mByteArray[3]);
-    			Log.i("TAG", "mByteArray[4] in Main Activity: " + mByteArray[4]);
+    			if (mByteArray[0] >= 10) {
+    				tvBAC.setText("Your BAC: 0." + mByteArray[0]);
+    			}
     			break;
     		}
     	}
@@ -85,10 +90,14 @@ public class MainActivity extends Activity {
     		DeviceLocation deviceLocation = new DeviceLocation(this); 
     		Location location = deviceLocation.getLocation();
     		String locationString = deviceLocation.displayLocation(location);
-            TextView locationText = (TextView)findViewById(R.id.location_text);
+    		
+            tvLocationText.setText("Location: " + locationString);
             
-            locationText.setText(locationString);
-            
+            // only request a taxi if one has not already been requested
+            if (taxi_requested == true) {
+            	Toast.makeText(getApplicationContext(), "Taxi has already been requested", Toast.LENGTH_SHORT).show();
+            	return;
+            }
             String SMSstring = "Driver,\n " +
             		"Will you pick me up at:\n" + 
             		locationString + "?\n" +
@@ -103,16 +112,23 @@ public class MainActivity extends Activity {
 
 			SmsManager smsManager = SmsManager.getDefault();
 			smsManager.sendTextMessage(strTaxiNumber, null, SMSstring, null, null);
-			Toast.makeText(getApplicationContext(), "SMS Sent", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "SMS Sent", Toast.LENGTH_SHORT).show();
+			taxi_requested = true;
 		}catch (Exception e) {
-			Toast.makeText(getApplicationContext(), "SMS Failed", Toast.LENGTH_LONG).show();
-			//e.printStackTrace();
+			Toast.makeText(getApplicationContext(), "SMS Failed", Toast.LENGTH_SHORT).show();
+			Log.i("TAG", "Error requesting taxi: " + e);
 		}
     	
     };
     
     public void connect_BAC(View view){
-    	// called when user presses BAC button (Connect to Breathalyzer button)
+    	// called when user presses Connect to Breathalyzer button
+    	
+    	// do nothing if already connected
+    	if (mConnectThread != null) {
+    		return;
+    	}
+    	
     	// ensure device supports Bluetooth
     	mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     	if (mBluetoothAdapter == null) {
@@ -121,11 +137,14 @@ public class MainActivity extends Activity {
     	}
     	// ensure Bluetooth is enabled
     	if (!mBluetoothAdapter.isEnabled()) {
+    		// request user to enable Bluetooth
     	    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
     	    startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
     	}
+    	
     	// set device address equal to MAC address of Bluetooth device on Breathalyzer
     	mDevice = mBluetoothAdapter.getRemoteDevice("20:13:11:14:01:49");
+    	
     	// connect in a separate thread
     	if (mConnectThread != null) {
     		mConnectThread.cancel();
@@ -134,19 +153,9 @@ public class MainActivity extends Activity {
     	mConnectThread.start();
     };
     
-    public void fetchBAC(View view){
-    	// called when user presses test BAC button
-    	byte[] bytes = "chaddd".getBytes();
-    	
-    	try {
-    		mConnectThread.write(bytes);
-    	} catch(Exception e) {
-    		Log.i("TAG", "in Main Activity mConnectThread.write(): " + e);
-    	}
-    }
-    
     @Override
     public void onStop() {
+    	// disconnect Bluetooth when app is closed
     	super.onStop();
     	if (mConnectThread != null) {
     		mConnectThread.cancel();

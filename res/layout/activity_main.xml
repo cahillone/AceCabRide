@@ -9,14 +9,6 @@
        	android:layout_width="match_parent"
   	    android:layout_height="0dp"
   	    android:layout_weight="1">
-    
-    	<Button 
-        		android:layout_width="0dp"
-        		android:layout_weight="1"
-       			android:layout_height="match_parent"
-        		android:text="@string/BAC_button" 
-        		android:id="@+id/BAC_button"
-        		android:onClick="fetchBAC"/>
     	
     	<Button 
     	    	android:layout_width="0dp"
@@ -32,7 +24,6 @@
   	    android:layout_height="0dp"
   	    android:layout_weight="2"
   	    android:orientation="vertical">
-    	
         <TextView
         	android:layout_width="wrap_content"
          	android:layout_height="0dp"
@@ -40,15 +31,10 @@
          	android:id="@+id/bt_connection_status" >
        	</TextView>
     	
-        <LinearLayout
+       	<LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
          	android:layout_weight="1">
-            <TextView
-         		android:layout_width="wrap_content"
-         		android:layout_height="wrap_content"
-         		android:text="@string/location_ui" >
-       		</TextView>
     	
         	<TextView
          		android:id="@+id/location_text"
@@ -56,20 +42,12 @@
          		android:layout_height="wrap_content" >
          	</TextView>
         </LinearLayout>
-    	
-        <TextView
-            android:id="@+id/read_value"
-        	android:layout_width="wrap_content"
-         	android:layout_height="0dp"
-         	android:layout_weight="1"
-         	android:text="@string/ADC_value" >
-       	</TextView>
-       	
+
         <TextView
         	android:layout_width="wrap_content"
          	android:layout_height="0dp"
          	android:layout_weight="1"
-         	android:text="@string/BAC_ui" >
+         	android:id="@+id/BAC" >
        	</TextView>
         
     </LinearLayout>
@@ -77,7 +55,7 @@
     <LinearLayout 
        	android:layout_width="match_parent"
   	    android:layout_height="0dp"
-  	    android:layout_weight="2">
+  	    android:layout_weight="1">
     
     	<Button 
         		android:layout_width="match_parent"

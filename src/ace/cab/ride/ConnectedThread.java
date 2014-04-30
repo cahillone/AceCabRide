@@ -32,26 +32,15 @@ public class ConnectedThread extends Thread {
     }
  
     public void run() {
-    	Log.i("TAG", "BEGIN mConnectedThread");
+    	Log.i("TAG", "BEGIN mConnectedThread"); // for debugging
         byte[] buffer = new byte[1024];  // buffer store for the stream
         int bytes; // bytes returned from read()
-        short shortBuffer;
-        
-        Log.i("TAG", "handler ConnectedThread: " + mHandler);
  
         // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
-                Log.i("TAG", "Rx buffer: " + buffer);
-                Log.i("TAG", "Rx buffer bytes: " + bytes);
-                Log.i("TAG1", "Rx buffer0 | 1: " + (buffer[0] | buffer[1]));
-                Log.i("TAG1", "Rx buffer0: " + buffer[0]);
-                Log.i("TAG1", "Rx buffer1: " + buffer[1]);
-                Log.i("TAG", "Rx buffer2: " + buffer[2]);
-                Log.i("TAG", "Rx buffer3: " + buffer[3]);
-                Log.i("TAG", "Rx buffer4: " + buffer[4]);
                 // Send the obtained bytes to the UI activity
                 mHandler.obtainMessage(MainActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
             } catch (Exception e) {
